@@ -5,3 +5,5 @@
 .pub/
 
 build/
+example/android/app/.cxx/
+.idea

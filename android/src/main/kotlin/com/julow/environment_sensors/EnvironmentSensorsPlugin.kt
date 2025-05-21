@@ -14,7 +14,6 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
-import io.flutter.plugin.common.PluginRegistry.Registrar
 
 /** EnvironmentSensorsPlugin */
 class EnvironmentSensorsPlugin: FlutterPlugin, MethodCallHandler {
@@ -42,21 +41,16 @@ class EnvironmentSensorsPlugin: FlutterPlugin, MethodCallHandler {
   private var lightStreamHandler: StreamHandlerImpl? = null
   private var pressureStreamHandler: StreamHandlerImpl? = null
 
-  companion object {
-    @JvmStatic
-    fun registerWith(registrar: Registrar) {
-      val plugin = EnvironmentSensorsPlugin()
-      plugin.setupEventChannels(registrar.context(), registrar.messenger())
-    }
-  }
-
-  override fun onAttachedToEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
+  override fun onAttachedToEngine(binding: FlutterPlugin.FlutterPluginBinding) {
+    channel = MethodChannel(binding.binaryMessenger, "environment_sensors")
+    channel.setMethodCallHandler(this)
     val context = binding.applicationContext
     setupEventChannels(context, binding.binaryMessenger)
   }
 
-  override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
+  override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
     teardownEventChannels()
+    channel.setMethodCallHandler(null)
   }
 
   override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
